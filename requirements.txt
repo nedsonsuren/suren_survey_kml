@@ -1,0 +1,2 @@
+pyproj>=3.5
+simplekml>=1.3
