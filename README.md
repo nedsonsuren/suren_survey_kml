@@ -113,6 +113,28 @@ should match the sum of side lengths on the original diagram (e.g. AB + BC
 + CD + DA). If they don't match, double check the Easting/Northing values
 were typed correctly.
 
+## Installing on another machine, and getting updates
+
+This project lives at
+[github.com/nedsonsuren/suren_survey_kml](https://github.com/nedsonsuren/suren_survey_kml).
+To set it up on a machine for the first time, clone it instead of copying
+the folder:
+
+```
+git clone https://github.com/nedsonsuren/suren_survey_kml.git
+```
+
+then follow "Setup" above inside that folder. Because it's a real clone,
+every time you run `python gui.py` or `python main.py` it checks GitHub
+for a newer commit and, if one exists, asks whether to pull it in before
+continuing (GUI: a Yes/No dialog before the window opens; CLI: a `[Y/n]`
+prompt) — no separate updater or reinstall needed. Declining just runs the
+current version as-is; if the check can't reach GitHub (no network), it's
+skipped silently.
+
+To push a change so every clone picks it up on next launch, commit and
+`git push` from your working copy as usual.
+
 ## Packaging as a Windows installer
 
 To hand this to someone without Python installed, build
@@ -152,4 +174,3 @@ identical KML output.
   the exact right spot" above).
 - `src/kml_writer.py` controls styling (colors, line width) — edit `PALETTE`
   to change parcel colors.
-# test update marker
