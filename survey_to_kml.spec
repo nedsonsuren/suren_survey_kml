@@ -4,7 +4,7 @@
 
 a = Analysis(
     ['gui.py'],
-    pathex=['src'],
+    pathex=['.'],
     binaries=[],
     datas=[
         ('assets', 'assets'),
@@ -38,5 +38,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='assets\\icon.ico',
+    icon='assets/icon.ico',
 )

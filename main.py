@@ -30,11 +30,24 @@ from geometry import perimeter, area
 from kml_writer import build_and_save
 from launcher import open_in_google_earth, describe_open_result
 from updater import check_for_update, apply_update
+from version import __version__
 
 
 def offer_update():
-    """Checks GitHub for a newer commit and, if found, offers to pull it in
-    before continuing. No-op if this isn't a git clone or there's no network."""
+    """Checks for a newer version and, if found, offers to update before
+    continuing. Packaged builds (installed .exe/AppImage) check GitHub
+    Releases and just point at the download — they can't `git pull`
+    themselves. Running from a git clone instead checks the repo directly
+    and can pull the update in place. No-op with no network either way."""
+    if getattr(sys, "frozen", False):
+        from release_check import check_for_update as check_release
+        status, detail = check_release()
+        if status == "update_available":
+            latest_version, url = detail
+            print(f"\nA new version is available: {latest_version} (you have {__version__}).")
+            print(f"Download it here: {url}")
+        return
+
     root = os.path.dirname(os.path.abspath(__file__))
     status, detail = check_for_update(root)
     if status != "update_available":

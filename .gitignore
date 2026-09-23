@@ -4,5 +4,10 @@ __pycache__/
 venv/
 build/
 dist/
+installer_output/
+*.AppImage
+appimagetool.AppImage
+AppDir/
+.build-venv/
 *.spec.bak
 *.kml

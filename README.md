@@ -98,7 +98,7 @@ If you enter a **custom EPSG code** covering multiple countries, there's no
 hint to pick the right one automatically; check the "Valid for" line that's
 printed, and if it doesn't match your survey's country, that's your signal
 the boundary may be off — consider adding a preset with a country hint for
-it in `src/converter.py` (`PRESETS`) instead.
+it in `converter.py` (`PRESETS`) instead.
 
 ## Checking you picked the right coordinate system
 
@@ -135,42 +135,58 @@ skipped silently.
 To push a change so every clone picks it up on next launch, commit and
 `git push` from your working copy as usual.
 
-## Packaging as a Windows installer
+## Installing without Python (Windows / Linux)
 
-To hand this to someone without Python installed, build
-`Survey-to-KML-Setup.exe` (a normal installer with a Start Menu shortcut
-and uninstaller) — see [BUILD.md](BUILD.md).
+To hand this to someone with no Python or git — just a working program:
+
+- **Windows**: `Survey-to-KML-Setup.exe` — a normal installer (Start Menu
+  shortcut, optional desktop shortcut, uninstaller).
+- **Linux**: `Survey-to-KML-<version>-x86_64.AppImage` — a single
+  double-clickable file, no install step.
+
+See [BUILD.md](BUILD.md) for how to build both. These installed copies
+check GitHub Releases (not `git pull` — see above) for a newer version on
+launch and, if one exists, show a message with a link to download it;
+they never modify themselves automatically.
 
 ## Project structure
 
 ```
 survey-to-kml/
-├── gui.py              # desktop GUI entry point (Tkinter)
-├── main.py             # interactive CLI entry point
+├── gui.py               # desktop GUI entry point (Tkinter)
+├── main.py              # interactive CLI entry point
+├── converter.py         # coordinate system presets + UTM -> lat/lon conversion
+├── geometry.py          # perimeter/area calculations
+├── kml_writer.py        # builds the KML polygons + labeled points + LookAt
+├── launcher.py          # opens the saved KML in Google Earth
+├── updater.py           # update check for git-clone installs (git pull)
+├── release_check.py     # update check for packaged installs (GitHub Releases)
+├── version.py           # single source of truth for the app version
 ├── requirements.txt
+├── survey_to_kml.spec   # PyInstaller build spec (both platforms)
+├── installer.iss        # Inno Setup script -> Windows installer
+├── packaging/
+│   ├── build_linux_appimage.sh
+│   └── survey-to-kml.desktop
 ├── assets/
-│   ├── icon.ico         # window/taskbar icon (multi-resolution)
-│   └── icon.png         # same icon, for cross-platform iconphoto()
-├── src/
-│   ├── converter.py    # coordinate system presets + UTM -> lat/lon conversion
-│   ├── geometry.py     # perimeter/area calculations
-│   ├── kml_writer.py   # builds the KML polygons + labeled points + LookAt
-│   └── launcher.py     # opens the saved KML in Google Earth
+│   ├── icon.ico          # window/taskbar icon (multi-resolution)
+│   └── icon.png          # same icon, for cross-platform iconphoto()
+├── BUILD.md
 └── README.md
 ```
 
 `gui.py` and `main.py` share the same validation and conversion logic —
 `validate_parcel_name`/`is_valid_label` live in `main.py`, everything else
-in `src/` — so both front ends reject the same mistakes and produce
-identical KML output.
+in the top-level modules above — so both front ends reject the same
+mistakes and produce identical KML output.
 
 ## Extending it
 
-- Add more coordinate-system presets in `src/converter.py` (`PRESETS` dict)
+- Add more coordinate-system presets in `converter.py` (`PRESETS` dict)
   if you regularly survey in other zones/datums — each entry is
   `(label, epsg, country_hint)`; set `country_hint` (e.g. `"Zambia"`) when
   the EPSG code's datum transformation is shared across multiple countries,
   so the right one gets picked automatically (see "Getting the boundary in
   the exact right spot" above).
-- `src/kml_writer.py` controls styling (colors, line width) — edit `PALETTE`
+- `kml_writer.py` controls styling (colors, line width) — edit `PALETTE`
   to change parcel colors.

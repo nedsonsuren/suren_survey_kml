@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Survey-to-KML
+Comment=Turn surveyed Easting/Northing points into a KML for Google Earth
+Exec=survey-to-kml
+Icon=survey-to-kml
+Categories=Utility;
+Terminal=false

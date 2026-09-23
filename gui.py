@@ -38,6 +38,7 @@ from kml_writer import build_and_save  # pyright: ignore[reportMissingImports]
 from launcher import open_in_google_earth, describe_open_result  # pyright: ignore[reportMissingImports]
 from updater import check_for_update, apply_update  # pyright: ignore[reportMissingImports]
 from main import is_valid_label, validate_parcel_name
+from version import __version__
 
 PRESET_LABELS = [label for (label, _epsg, _hint) in PRESETS.values()]
 PRESET_KEYS = list(PRESETS.keys())
@@ -458,9 +459,28 @@ class App(tk.Tk):
 
 
 def _offer_update():
-    """Checks GitHub for a newer commit and, if found, offers to pull it in
-    before the main window opens. No-op if this isn't a git clone or
-    there's no network."""
+    """Checks for a newer version before the main window opens. Packaged
+    builds (installed .exe/AppImage) check GitHub Releases and just point
+    at the download — they can't `git pull` themselves. Running from a git
+    clone instead checks the repo directly and can pull the update in
+    place. No-op with no network either way."""
+    if getattr(sys, "frozen", False):
+        from release_check import check_for_update as check_release
+        status, detail = check_release()
+        if status != "update_available":
+            return
+        latest_version, url = detail
+        prompt_root = tk.Tk()
+        prompt_root.withdraw()
+        messagebox.showinfo(
+            "Update available",
+            f"A new version is available: {latest_version} (you have {__version__}).\n\n"
+            f"Download it here:\n{url}",
+            parent=prompt_root,
+        )
+        prompt_root.destroy()
+        return
+
     root = os.path.dirname(os.path.abspath(__file__))
     status, detail = check_for_update(root)
     if status != "update_available":
